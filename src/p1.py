@@ -17,6 +17,9 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         Otherwise, return None.
 
     """
+
+    shortest_path = None
+
     pass
 
 
@@ -51,6 +54,44 @@ def navigation_edges(level, cell):
              ((1,1), 1.4142135623730951),
              ... ]
     """
+
+    wall = level['walls']
+    spcs = level['spaces']
+    wayp = level['waypoints']
+
+    diag = sqrt(2)
+
+    # assume that a cell in a wall has no path anywhere
+    if cell in wall:
+        return []
+
+    weig = spaces.get(cell)
+    if weig is None:
+    # cell is not a regular space, it must be a waypoint
+        weig = wayp.get(cell)
+
+    # list of cardinal directions
+    adj  = [
+        ((-1,-1), diag), ((-1, 0), 1), ((0, -1), 1), ((-1, 1), diag),
+        ((1, -1), diag), ((1, 0) , 1), ((0, 1) , 1), ((1, 1) , diag)
+    ]
+    # build list of points that are adjacent to cell, regardless if they are valid
+    adj_points = [ ((x + cell[0], y + cell[1]), w) for (x, y), w in adj ]
+
+    result = []
+
+    for point, dist in adj_points:
+        point_weight = None
+        if point in wall:
+            continue
+        point_weight = spaces.get(point)
+        if point_weight is None:
+            point_weight = wayp.get(point)
+
+        # cost of the edge between the two cells
+        cost = dist * (point_weight + weig) / 2
+        result.append(point, cost)
+
     pass
 
 
@@ -104,7 +145,7 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
 
 
 if __name__ == '__main__':
-    filename, src_waypoint, dst_waypoint = 'example.txt', 'a','e'
+    filename, src_waypoint, dst_waypoint = 'input/example.txt', 'a','e'
 
     # Use this function call to find the route between two waypoints.
     test_route(filename, src_waypoint, dst_waypoint)
