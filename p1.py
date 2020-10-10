@@ -11,16 +11,38 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         destination: The end location for the path.
         graph: A loaded level, containing walls, spaces, and waypoints.
         adj: An adjacency function returning cells adjacent to a given cell as well as their respective edge costs.
-
-    Returns:
+    Returns:x
         If a path exits, return a list containing all cells from initial_position to destination.
         Otherwise, return None.
 
     """
 
-    shortest_path = None
+    pathcost = 0
+    shortest_path = []
+    tracking = {}
+    tracking[initial_position] = (0, None)
 
-    pass
+    queue = [(0, initial_position)]
+    while queue:
+        currCost, currNode = heappop(queue)
+        if currNode == destination:
+            while tracking[currNode][1]:
+                shortest_path.append(currNode)
+                currNode = tracking[currNode][1]
+            shortest_path.append(currNode)
+            return shortest_path
+
+        else:
+            for cost, node in adj(graph, currNode):
+                pathcost = cost + tracking[currNode][0]
+                if node not in tracking:
+                    tracking[node] = (pathcost, currNode)
+                    heappush(queue, (pathcost, node))
+                elif pathcost < tracking[node][0]:
+                    tracking.pop(node)
+                    tracking[node] = (pathcost, currNode)
+                    heappush(queue, (pathcost, node))
+    return None
 
 
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
@@ -34,18 +56,32 @@ def dijkstras_shortest_path_to_all(initial_position, graph, adj):
     Returns:
         A dictionary, mapping destination cells to the cost of a path from the initial_position.
     """
-    pass
+    tracking = {}
+    tracking[initial_position] = 0
+    queue = [(0, initial_position)]
+    while queue:
+        currCost, currNode = heappop(queue)
+        for cost, node in adj(graph, currNode):
+            pathcost = cost + tracking[currNode]
+            if node not in tracking:
+                tracking[node] = pathcost
+                heappush(queue, (pathcost, node))
+            elif pathcost < tracking[node]:
+                tracking.pop(node)
+                tracking[node] = pathcost
+                heappush(queue, (pathcost, node))
+    return tracking
 
 
 def navigation_edges(level, cell):
     """ Provides a list of adjacent cells and their respective costs from the given cell.
-
+    
     Args:
         level: A loaded level, containing walls, spaces, and waypoints.
         cell: A target location.
 
     Returns:
-        A list of tuples containing an adjacent cell's coordinates and the cost of the edge joining it and the
+        A list of tuples containing an adjacent cell's coordinates and the cost of the edge joining it and 
         originating cell.
 
         E.g. from (0,0):
@@ -56,7 +92,7 @@ def navigation_edges(level, cell):
     """
 
     wall = level['walls']
-    spcs = level['spaces']
+    spaces = level['spaces']
     wayp = level['waypoints']
 
     diag = sqrt(2)
@@ -90,9 +126,9 @@ def navigation_edges(level, cell):
 
         # cost of the edge between the two cells
         cost = dist * (point_weight + weig) / 2
-        result.append(point, cost)
+        result.append((cost, point))
 
-    pass
+    return result
 
 
 def test_route(filename, src_waypoint, dst_waypoint):
@@ -115,7 +151,7 @@ def test_route(filename, src_waypoint, dst_waypoint):
 
     # Search for and display the path from src to dst.
     path = dijkstras_shortest_path(src, dst, level, navigation_edges)
-    if path:
+        if path:
         show_level(level, path)
     else:
         print("No path possible!")
@@ -131,7 +167,7 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
         output_filename: The filename for the output csv file.
 
     """
-    
+
     # Load and display the level.
     level = load_level(filename)
     show_level(level)
@@ -145,10 +181,10 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
 
 
 if __name__ == '__main__':
-    filename, src_waypoint, dst_waypoint = 'input/example.txt', 'a','e'
+    filename, src_waypoint, dst_waypoint = 'example.txt', 'a','e'
 
     # Use this function call to find the route between two waypoints.
     test_route(filename, src_waypoint, dst_waypoint)
 
     # Use this function to calculate the cost to all reachable cells from an origin point.
-    cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
+    #cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
