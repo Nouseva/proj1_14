@@ -75,7 +75,6 @@ def dijkstras_shortest_path_to_all(initial_position, graph, adj):
 
 def navigation_edges(level, cell):
     """ Provides a list of adjacent cells and their respective costs from the given cell.
-    
     Args:
         level: A loaded level, containing walls, spaces, and waypoints.
         cell: A target location.
@@ -170,7 +169,7 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
 
     # Load and display the level.
     level = load_level(filename)
-    show_level(level)
+    # show_level(level)
 
     # Retrieve the source coordinates from the level.
     src = level['waypoints'][src_waypoint]
@@ -181,10 +180,15 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
 
 
 if __name__ == '__main__':
-    filename, src_waypoint, dst_waypoint = 'example.txt', 'a','e'
+    filename, src_waypoint, dst_waypoint = 'test_maze.txt', 'a','d'
 
     # Use this function call to find the route between two waypoints.
-    test_route(filename, src_waypoint, dst_waypoint)
+    #test_route(filename, src_waypoint, dst_waypoint)
 
     # Use this function to calculate the cost to all reachable cells from an origin point.
-    cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
+
+    # User maze costs
+    cost_to_all_cells('my_maze.txt', 'a', 'my_maze_costs.csv')
+
+    test_route('test_maze.txt', 'a', 'd')
+
